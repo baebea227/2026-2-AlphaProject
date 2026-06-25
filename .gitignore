@@ -101,6 +101,9 @@ InitTestScene*.unity*
 # Local editor / assistant settings
 .vscode/
 .claude/
+.codex/
+.cursor/
+AGENTS.md
 
 # Unity / IDE generated files
 *.slnx
