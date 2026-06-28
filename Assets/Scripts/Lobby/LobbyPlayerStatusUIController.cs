@@ -18,6 +18,8 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
     [SerializeField] private Button readyButton;
     [Tooltip("Ready 또는 Cancel 문구를 표시하는 버튼 텍스트입니다.")]
     [SerializeField] private TMP_Text readyButtonText;
+    [Tooltip("Host가 모든 플레이어의 Ready 완료 후 사용할 게임 시작 버튼입니다.")]
+    [SerializeField] private Button gameStartButton;
 
     private LobbyPlayerRoster boundRoster;
 
@@ -26,6 +28,7 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
         // 세션에 연결되기 전에는 모든 플레이어 상태 슬롯을 숨깁니다.
         ClearPlayerStatusTexts();
         RefreshReadyButton();
+        RefreshGameStartButton();
     }
 
     private void OnEnable()
@@ -144,6 +147,7 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
         }
 
         RefreshReadyButton();
+        RefreshGameStartButton();
     }
 
     private void ToggleLocalReady()
@@ -171,6 +175,22 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
 
         bool isReady = hasLocalPlayer && boundRoster.IsReady(sessionService.Runner.LocalPlayer);
         readyButtonText.text = isReady ? "Cancel" : "Ready";
+    }
+
+    private void RefreshGameStartButton()
+    {
+        if (gameStartButton == null)
+        {
+            return;
+        }
+
+        // Host이면서 현재 세션의 모든 참가자가 Ready일 때만 게임 시작을 허용합니다.
+        bool canStartGame = boundRoster != null
+            && sessionService != null
+            && sessionService.Runner != null
+            && sessionService.Runner.IsServer
+            && boundRoster.AreAllPlayersReady;
+        gameStartButton.interactable = canStartGame;
     }
 
     private void ClearPlayerStatusTexts()

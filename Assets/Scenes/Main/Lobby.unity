@@ -2693,6 +2693,7 @@ MonoBehaviour:
   - {fileID: 934179305}
   readyButton: {fileID: 593501717}
   readyButtonText: {fileID: 1576142172}
+  gameStartButton: {fileID: 2042747785}
 --- !u!1 &1514279408
 GameObject:
   m_ObjectHideFlags: 0

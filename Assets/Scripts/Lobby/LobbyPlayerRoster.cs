@@ -18,6 +18,30 @@ public sealed class LobbyPlayerRoster : MonoBehaviour, INetworkRunnerCallbacks
 
     public IReadOnlyList<PlayerRef> Players => players;
 
+    /// <summary>
+    /// 세션에 플레이어가 한 명 이상 있고 모든 플레이어가 Ready인지 나타냅니다.
+    /// </summary>
+    public bool AreAllPlayersReady
+    {
+        get
+        {
+            if (players.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (PlayerRef player in players)
+            {
+                if (!IsReady(player))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
     public event Action PlayerStatesChanged;
 
     /// <summary>
