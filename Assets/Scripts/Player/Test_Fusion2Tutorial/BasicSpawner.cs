@@ -35,6 +35,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
         });
     }
 
+    // GUI로 임시 게임 실행 메뉴 띄우기
     private void OnGUI()
     {
         if(_runner == null)
@@ -101,6 +102,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     }
     */
 
+    // NetworkInputManager에게 역할 전담
     /*
     private PlayerInputHandler localHandler;
 

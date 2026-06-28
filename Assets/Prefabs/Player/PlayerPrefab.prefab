@@ -117,6 +117,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1384921729135419083}
   - {fileID: 8858391721762176390}
+  - {fileID: 1505710363900841254}
   - {fileID: 3360425608349917206}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &684427438748064101
@@ -217,6 +218,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e48aff69db9ab4ba38acc55e72f862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatus
+  initialHp: 100
+  initialStamina: 100
+  staminaConsumerate: 20
+  staminaRegenRate: 10
+  _Hp: 0
+  _Stamina: 0
+  initialWalkSpeed: 2
+  initialSprintSpeed: 5
+  _WalkSpeed: 0
+  _SprintSpeed: 0
 --- !u!114 &3360425608349917206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,7 +240,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdd5a227ae48264790316f6d13bec83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  walkSpeed: 2
 --- !u!1 &7626002532921620167
 GameObject:
   m_ObjectHideFlags: 0

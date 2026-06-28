@@ -3,17 +3,21 @@ using Fusion;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    public float walkSpeed;
-
-    PlayerInputHandler playerInput;
+    PlayerStatus status;
     CharacterController controller;
     NetworkCharacterController cc;
 
     void Awake()
     {
-        playerInput = GetComponent<PlayerInputHandler>();
+        status = GetComponent<PlayerStatus>();
         controller = GetComponent<CharacterController>();
         cc = GetComponent<NetworkCharacterController>();
+    }
+
+    public override void Spawned()
+    {
+        cc.acceleration = 100f;
+        cc.braking = 100f;
     }
 
     public override void FixedUpdateNetwork()
@@ -21,23 +25,42 @@ public class PlayerMovement : NetworkBehaviour
         Move();
     }
 
+    // 이동
     void Move()
     {
         if(GetInput(out NetworkInputData input))
         {
             Vector3 moveDir = new Vector3(input.moveInput.x, 0, input.moveInput.y);
-            if(moveDir.sqrMagnitude > 1)
+            if(moveDir.sqrMagnitude > 1f)
             {
                 moveDir.Normalize();
             }
-            moveDir *= walkSpeed * Runner.DeltaTime;
-            cc.Move(moveDir);
+            Turn(moveDir);
 
-            if (moveDir != Vector3.zero)
+            float moveSpeed = 0f;
+            if (input.isSprinting && status.Stamina > 0)
             {
-                Quaternion moveRot = Quaternion.LookRotation(moveDir, Vector3.up);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, moveRot, 720f * Time.deltaTime);
+                moveSpeed = status.SprintSpeed;
             }
+            else if (input.moveInput.magnitude > 0f)
+            {
+                moveSpeed = status.WalkSpeed;
+            }
+            cc.maxSpeed = moveSpeed;
+
+            cc.Move(moveDir * Runner.DeltaTime);
         }
+    }
+
+    // 회전
+    void Turn(Vector3 dir)
+    {
+        if(dir == Vector3.zero)
+        {
+            return;
+        }
+
+        Quaternion rotation = Quaternion.LookRotation(dir, Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 360f * Runner.DeltaTime);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class NetworkInputManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
+    public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var localObj = runner.GetPlayerObject(runner.LocalPlayer);
         PlayerInputHandler handler = null;
