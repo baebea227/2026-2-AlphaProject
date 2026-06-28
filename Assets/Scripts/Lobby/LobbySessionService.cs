@@ -41,6 +41,9 @@ public sealed class LobbySessionService : MonoBehaviour
     public bool IsBusy { get; private set; }
     public string CurrentRoomCode { get; private set; } = string.Empty;
     public NetworkRunner Runner { get; private set; }
+    public LobbyPlayerRoster PlayerRoster { get; private set; }
+
+    public event Action<LobbyPlayerRoster> PlayerRosterReady;
 
     private void Awake()
     {
@@ -97,13 +100,16 @@ public sealed class LobbySessionService : MonoBehaviour
 
         IsBusy = true;
 
-        // NetworkRunner를 별도 자식 객체로 두어 서비스와 네트워크 실행 책임을 구분합니다.
+        // Fusion이 Runner에 DontDestroyOnLoad를 적용하므로 반드시 루트 GameObject로 생성합니다.
         GameObject runnerObject = new GameObject("LobbyNetworkRunner");
-        runnerObject.transform.SetParent(transform);
 
         NetworkRunner newRunner = runnerObject.AddComponent<NetworkRunner>();
         newRunner.ProvideInput = true;
         NetworkSceneManagerDefault sceneManager = runnerObject.AddComponent<NetworkSceneManagerDefault>();
+        LobbyPlayerRoster newPlayerRoster = runnerObject.AddComponent<LobbyPlayerRoster>();
+
+        // 세션 시작 전에 콜백을 등록해 로컬 플레이어의 최초 참가도 로스터에 포함합니다.
+        newPlayerRoster.Initialize(newRunner);
 
         try
         {
@@ -127,6 +133,10 @@ public sealed class LobbySessionService : MonoBehaviour
 
             Runner = newRunner;
             CurrentRoomCode = roomCode;
+            PlayerRoster = newPlayerRoster;
+
+            // UI가 현재 로스터의 참가·퇴장 이벤트를 구독할 수 있도록 연결 완료를 알립니다.
+            PlayerRosterReady?.Invoke(PlayerRoster);
             return LobbySessionStartResult.Success(roomCode);
         }
         catch (Exception exception)
