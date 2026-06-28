@@ -36,6 +36,10 @@ public readonly struct LobbySessionStartResult
 /// </summary>
 public sealed class LobbySessionService : MonoBehaviour
 {
+    // 게임 시작에 필요한 최소 인원과 Fusion 세션이 허용할 최대 인원을 한곳에서 관리합니다.
+    public const int MinimumPlayerCount = 1;
+    public const int MaximumPlayerCount = 4;
+
     public static LobbySessionService Instance { get; private set; }
 
     public bool IsBusy { get; private set; }
@@ -120,6 +124,8 @@ public sealed class LobbySessionService : MonoBehaviour
                 GameMode = gameMode,
                 SessionName = roomCode,
                 SceneManager = sceneManager,
+                // 대기방 UI 슬롯 수와 동일하게 세션 참가 인원을 최대 4명으로 제한합니다.
+                PlayerCount = MaximumPlayerCount,
                 IsOpen = true,
                 IsVisible = false,
                 EnableClientSessionCreation = false

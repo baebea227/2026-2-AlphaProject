@@ -25,7 +25,7 @@ public sealed class LobbyPlayerRoster : MonoBehaviour, INetworkRunnerCallbacks
     {
         get
         {
-            if (players.Count == 0)
+            if (players.Count < LobbySessionService.MinimumPlayerCount)
             {
                 return false;
             }
