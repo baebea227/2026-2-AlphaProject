@@ -224,9 +224,13 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
             return;
         }
 
-        // 기존 SceneFlowManager를 사용해 MainStage 씬 전환을 시작합니다.
+        // Host의 Runner로 네트워크 씬 정보를 갱신해 세션 참가자 전원을 MainStage로 이동시킵니다.
         gameStartButton.interactable = false;
-        sceneFlowManager.LoadMainStage();
+        if (!sceneFlowManager.LoadNetworkMainStage(sessionService.Runner))
+        {
+            // 씬 전환을 시작하지 못한 경우 Host가 조건을 확인하고 다시 시도할 수 있게 버튼 상태를 복구합니다.
+            RefreshGameStartButton();
+        }
     }
 
     private void ClearPlayerStatusTexts()
