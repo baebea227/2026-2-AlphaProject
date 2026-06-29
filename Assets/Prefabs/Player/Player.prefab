@@ -18,8 +18,8 @@ GameObject:
   - component: {fileID: 1505710363900841254}
   - component: {fileID: 3360425608349917206}
   m_Layer: 0
-  m_Name: PlayerPrefab
-  m_TagString: Untagged
+  m_Name: Player
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,12 +172,12 @@ MonoBehaviour:
   initialStamina: 100
   staminaConsumeRate: 20
   staminaRegenRate: 10
-  _Hp: 0
-  _Stamina: 0
+  _NetHp: 0
+  _NetStamina: 0
   initialWalkSpeed: 2
   initialSprintSpeed: 5
-  _WalkSpeed: 0
-  _SprintSpeed: 0
+  _NetWalkSpeed: 0
+  _NetSprintSpeed: 0
 --- !u!114 &3360425608349917206
 MonoBehaviour:
   m_ObjectHideFlags: 0

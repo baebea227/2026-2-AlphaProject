@@ -20,18 +20,11 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void Spawned()
     {
-        Debug.Log("This is Spawned");
         isLocalTesting = false;
 
         cc = GetComponent<NetworkCharacterController>();
         cc.acceleration = 100f;
         cc.braking = 100f;
-    }
-
-    void Start()
-    {
-        //isLocalTesting = true;
-        Debug.Log("This is Start");
     }
 
     public override void FixedUpdateNetwork()
