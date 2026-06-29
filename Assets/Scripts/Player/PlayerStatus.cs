@@ -8,30 +8,95 @@ public class PlayerStatus : NetworkBehaviour
     public float initialStamina;
     public float staminaConsumeRate;
     public float staminaRegenRate;
-
-    [Networked] public int Hp { get; set; }
-    [Networked] public float Stamina { get; set; }
+    int localHp;
+    float localStamina;
+    [Networked] public int NetHp { get; set; }
+    [Networked] public float NetStamina { get; set; }
+    public int Hp
+    {
+        get => isSpawned ? NetHp : localHp;
+        set { if (isSpawned) NetHp = value; else localHp = value; }
+    }
+    public float Stamina
+    {
+        get => isSpawned ? NetStamina : localStamina;
+        set { if (isSpawned) NetStamina = value; else localStamina = value; }
+    }
     [Space(15)]
 
     [Header("Movement")]
     public float initialWalkSpeed;
     public float initialSprintSpeed;
+    float localWalkSpeed;
+    float localSprintSpeed;
+    [Networked] public float NetWalkSpeed { get; set; }
+    [Networked] public float NetSprintSpeed { get; set; }
+    public float WalkSpeed
+    {
+        get => isSpawned ? NetWalkSpeed : localWalkSpeed;
+        set { if (isSpawned) NetWalkSpeed = value; else localWalkSpeed = value; }
+    }
+    public float SprintSpeed
+    {
+        get => isSpawned ? NetSprintSpeed : localSprintSpeed;
+        set { if (isSpawned) NetSprintSpeed = value; else localSprintSpeed = value; }
+    }
 
-    [Networked] public float WalkSpeed { get; set; }
-    [Networked] public float SprintSpeed { get; set; }
+    bool isSpawned = false;
+
+    PlayerInputHandler handler;
+
+    void OnEnable()
+    {
+        if(handler == null)
+        {
+            handler = GetComponent<PlayerInputHandler>();
+        }
+
+        localHp = initialHp;
+        localStamina = initialStamina;
+        localWalkSpeed = initialWalkSpeed;
+        localSprintSpeed = initialSprintSpeed;
+    }
 
     public override void Spawned()
     {
-        Hp = initialHp;
-        Stamina = initialStamina;
-        WalkSpeed = initialWalkSpeed;
-        SprintSpeed = initialSprintSpeed;
+        isSpawned = true;
+
+        NetHp = initialHp;
+        NetStamina = initialStamina;
+        NetWalkSpeed = initialWalkSpeed;
+        NetSprintSpeed = initialSprintSpeed;
     }
 
     public override void FixedUpdateNetwork()
     {
+        if (!isSpawned)
+        {
+            return;
+        }
+
         GetInput(out NetworkInputData input);
 
+        // 스태미나 증감
+        if (input.isSprinting && input.moveInput != Vector2.zero)
+        {
+            ConsumeStamina();
+        }
+        else
+        {
+            RegenStamina();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (isSpawned)
+        {
+            return;
+        }
+
+        NetworkInputData input = handler.GetInputData();
         // 스태미나 증감
         if (input.isSprinting && input.moveInput != Vector2.zero)
         {
@@ -46,7 +111,7 @@ public class PlayerStatus : NetworkBehaviour
     #region Stamina Control
     void ConsumeStamina()
     {
-        Stamina -= staminaConsumeRate * Runner.DeltaTime;
+        Stamina -= staminaConsumeRate * (isSpawned ? Runner.DeltaTime : Time.deltaTime);
         if(Stamina < 0)
         {
             Stamina = 0;
@@ -55,7 +120,7 @@ public class PlayerStatus : NetworkBehaviour
 
     void RegenStamina()
     {
-        Stamina += staminaRegenRate * Runner.DeltaTime;
+        Stamina += staminaRegenRate * (isSpawned ? Runner.DeltaTime : Time.deltaTime);
         if (Stamina > initialStamina)
         {
             Stamina = initialStamina;

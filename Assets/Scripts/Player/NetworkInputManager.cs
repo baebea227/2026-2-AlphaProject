@@ -6,24 +6,30 @@ using UnityEngine;
 
 public class NetworkInputManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    PlayerInputHandler cachedLocalHandler;
+
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var localObj = runner.GetPlayerObject(runner.LocalPlayer);
-        PlayerInputHandler handler = null;
 
-        if (localObj != null)
+        if (cachedLocalHandler == null)
         {
-            handler = localObj.GetComponent<PlayerInputHandler>();
-        }
-        else
-        {
-            Debug.Log("There is no local player object");
+            PlayerInputHandler[] handlers = FindObjectsByType<PlayerInputHandler>(FindObjectsSortMode.None);
+            foreach (var handler in handlers)
+            {
+                NetworkObject nObj = handler.GetComponent<NetworkObject>();
+
+                if (nObj != null && nObj.HasInputAuthority)
+                {
+                    cachedLocalHandler = handler;
+                    break;
+                }
+            }
         }
 
-        if (handler != null)
+        if (cachedLocalHandler != null)
         {
-            handler.OnInput(runner, input);
-            return;
+            NetworkInputData data = cachedLocalHandler.GetInputData();
+            input.Set(data);
         }
     }
 
