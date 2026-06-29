@@ -105,6 +105,11 @@ InitTestScene*.unity*
 .cursor/
 AGENTS.md
 
+# ParrelSync auto-generated local project settings
+/[Aa]ssets/Plugins.meta
+/[Aa]ssets/Plugins/ParrelSync.meta
+/[Aa]ssets/Plugins/ParrelSync/
+
 # Unity / IDE generated files
 *.slnx
 *.lscache
