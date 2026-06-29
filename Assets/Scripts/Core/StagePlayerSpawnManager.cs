@@ -161,6 +161,11 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
         if (spawnedNetworkPlayers.TryGetValue(player, out NetworkObject existingPlayer) && existingPlayer != null)
         {
+            if (runner.GetPlayerObject(player) != existingPlayer)
+            {
+                runner.SetPlayerObject(player, existingPlayer);
+            }
+
             return existingPlayer;
         }
 
@@ -168,6 +173,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
         NetworkObject spawnedPlayer = runner.Spawn(networkPlayerPrefab, GetSpawnPosition(playerIndex), GetSpawnRotation(playerIndex), player);
 
         spawnedNetworkPlayers[player] = spawnedPlayer;
+        runner.SetPlayerObject(player, spawnedPlayer);
         return spawnedPlayer;
     }
 
