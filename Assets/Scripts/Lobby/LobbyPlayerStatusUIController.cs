@@ -47,6 +47,11 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
             readyButton.onClick.AddListener(ToggleLocalReady);
         }
 
+        if (gameStartButton != null)
+        {
+            gameStartButton.onClick.AddListener(StartGame);
+        }
+
         // UI가 늦게 활성화된 경우 이미 생성된 로스터를 즉시 연결합니다.
         if (sessionService.PlayerRoster != null)
         {
@@ -64,6 +69,11 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
         if (readyButton != null)
         {
             readyButton.onClick.RemoveListener(ToggleLocalReady);
+        }
+
+        if (gameStartButton != null)
+        {
+            gameStartButton.onClick.RemoveListener(StartGame);
         }
 
         UnbindRoster();
@@ -191,6 +201,32 @@ public sealed class LobbyPlayerStatusUIController : MonoBehaviour
             && sessionService.Runner.IsServer
             && boundRoster.AreAllPlayersReady;
         gameStartButton.interactable = canStartGame;
+    }
+
+    private void StartGame()
+    {
+        // 버튼 활성화 조건을 다시 검증해 코드 호출로 조건을 우회하지 못하게 합니다.
+        bool canStartGame = boundRoster != null
+            && sessionService != null
+            && sessionService.Runner != null
+            && sessionService.Runner.IsServer
+            && boundRoster.AreAllPlayersReady;
+
+        if (!canStartGame)
+        {
+            return;
+        }
+
+        SceneFlowManager sceneFlowManager = SceneFlowManager.Instance;
+        if (sceneFlowManager == null)
+        {
+            Debug.LogError($"{nameof(LobbyPlayerStatusUIController)}: SceneFlowManager가 없습니다.", this);
+            return;
+        }
+
+        // 기존 SceneFlowManager를 사용해 MainStage 씬 전환을 시작합니다.
+        gameStartButton.interactable = false;
+        sceneFlowManager.LoadMainStage();
     }
 
     private void ClearPlayerStatusTexts()
