@@ -15,14 +15,12 @@ public class PlayerInputHandler : NetworkBehaviour
         sprintAction = playerInput.actions["Sprint"];
     }
 
-    public void OnInput(NetworkRunner runner, NetworkInput input)
+    public NetworkInputData GetInputData()
     {
-        NetworkInputData data = new NetworkInputData
+        return new NetworkInputData
         {
             moveInput = moveAction.ReadValue<Vector2>(),
             isSprinting = sprintAction.IsPressed()
         };
-
-        input.Set(data);
     }
 }
