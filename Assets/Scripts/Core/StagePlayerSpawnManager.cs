@@ -71,6 +71,10 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
         {
             SpawnLocalPlayers();
         }
+        else if (spawnBackend == PlayerSpawnBackend.FusionNetwork && spawnOnStart)
+        {
+            TrySpawnActiveNetworkPlayers(registeredRunner, true);
+        }
     }
 
     private void OnDisable()
@@ -206,6 +210,11 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
         networkRunner.RemoveCallbacks(this);
         networkRunner.AddCallbacks(this);
         registeredRunner = networkRunner;
+
+        if (spawnOnStart)
+        {
+            TrySpawnActiveNetworkPlayers(registeredRunner, true);
+        }
     }
 
     private void UnregisterNetworkCallbacks()
@@ -230,6 +239,24 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     private int GetNetworkPlayerIndex(PlayerRef player)
     {
         return Mathf.Max(0, player.PlayerId);
+    }
+
+    private void TrySpawnActiveNetworkPlayers(NetworkRunner runner, bool requireSceneReady)
+    {
+        if (spawnBackend != PlayerSpawnBackend.FusionNetwork || !CanSpawnNetworkPlayers(runner))
+        {
+            return;
+        }
+
+        if (requireSceneReady && runner.IsSceneManagerBusy)
+        {
+            return;
+        }
+
+        foreach (PlayerRef player in runner.ActivePlayers)
+        {
+            SpawnNetworkPlayer(runner, player);
+        }
     }
 
     private Vector3 GetSpawnPosition(int playerIndex)
@@ -290,6 +317,14 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
     void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
     void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
-    void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner) { }
+    void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
+    {
+        if (!spawnOnStart)
+        {
+            return;
+        }
+
+        TrySpawnActiveNetworkPlayers(runner, false);
+    }
     void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner) { }
 }

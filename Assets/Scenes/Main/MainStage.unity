@@ -652,7 +652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b86fa8c43779fcc44af93995ea8bdda3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StagePlayerSpawnManager
-  spawnBackend: 0
+  spawnBackend: 1
   spawnOnStart: 1
   localPlayerPrefab: {fileID: 24278698455303069, guid: 4a38c3e7a18ef08448284372ce162a64, type: 3}
   localPlayerCount: 1
