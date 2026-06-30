@@ -15,6 +15,21 @@ public class PlayerInputHandler : NetworkBehaviour
         sprintAction = playerInput.actions["Sprint"];
     }
 
+    public override void Spawned()
+    {
+        if (HasInputAuthority)
+        {
+            playerInput.enabled = true;
+
+            if (Runner != null && Object != null)
+                Runner.SetPlayerObject(Object.InputAuthority, Object);
+
+            return;
+        }
+
+        playerInput.enabled = false;
+    }
+
     public NetworkInputData GetInputData()
     {
         return new NetworkInputData
