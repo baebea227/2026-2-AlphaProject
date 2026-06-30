@@ -7,7 +7,7 @@ public class PlayerInputHandler : NetworkBehaviour
     PlayerInput playerInput;
     InputAction moveAction;
     InputAction sprintAction;
-
+    [SerializeField] Camera cam;
     void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -21,13 +21,21 @@ public class PlayerInputHandler : NetworkBehaviour
         {
             playerInput.enabled = true;
 
-            if (Runner != null && Object != null)
-                Runner.SetPlayerObject(Object.InputAuthority, Object);
+            if(cam != null)
+            {
+                cam.gameObject.SetActive(true);
+            }
 
             return;
         }
 
         playerInput.enabled = false;
+
+        Camera remoteCam = GetComponentInChildren<Camera>();
+        if (remoteCam != null)
+        {
+            remoteCam.gameObject.SetActive(false);
+        }
     }
 
     public NetworkInputData GetInputData()
