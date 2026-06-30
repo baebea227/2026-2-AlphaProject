@@ -51,6 +51,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     private readonly List<GameObject> spawnedLocalPlayers = new List<GameObject>();
     private readonly Dictionary<PlayerRef, NetworkObject> spawnedNetworkPlayers = new Dictionary<PlayerRef, NetworkObject>();
 
+    private MainStageBootstrap runnerBootstrap;
     private NetworkRunner registeredRunner;
 
     public IReadOnlyList<GameObject> SpawnedLocalPlayers
@@ -60,12 +61,36 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void OnEnable()
     {
+        if (spawnBackend != PlayerSpawnBackend.FusionNetwork)
+        {
+            return;
+        }
+
+        // 테스트 씬의 부트스트랩이 있으면 Runner 준비 완료 이벤트를 우선 기다립니다.
+        runnerBootstrap = FindFirstObjectByType<MainStageBootstrap>();
+        if (runnerBootstrap != null)
+        {
+            runnerBootstrap.RunnerReady -= HandleRunnerReady;
+            runnerBootstrap.RunnerReady += HandleRunnerReady;
+
+            if (runnerBootstrap.IsRunnerReady)
+            {
+                HandleRunnerReady(runnerBootstrap.Runner);
+            }
+
+            return;
+        }
+
+        // 로비를 거쳐 MainStage에 들어온 경우 이미 실행 중인 Runner를 바로 사용합니다.
         TryRegisterNetworkCallbacks();
     }
 
     private void Start()
     {
-        TryRegisterNetworkCallbacks();
+        if (spawnBackend == PlayerSpawnBackend.FusionNetwork && runnerBootstrap == null)
+        {
+            TryRegisterNetworkCallbacks();
+        }
 
         if (spawnBackend == PlayerSpawnBackend.LocalInstantiate && spawnOnStart)
         {
@@ -79,6 +104,12 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void OnDisable()
     {
+        if (runnerBootstrap != null)
+        {
+            runnerBootstrap.RunnerReady -= HandleRunnerReady;
+            runnerBootstrap = null;
+        }
+
         UnregisterNetworkCallbacks();
     }
 
@@ -174,6 +205,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
         spawnedNetworkPlayers[player] = spawnedPlayer;
         runner.SetPlayerObject(player, spawnedPlayer);
+
         return spawnedPlayer;
     }
 
@@ -198,7 +230,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void TryRegisterNetworkCallbacks()
     {
-        if (spawnBackend != PlayerSpawnBackend.FusionNetwork || registeredRunner != null)
+        if (spawnBackend != PlayerSpawnBackend.FusionNetwork)
         {
             return;
         }
@@ -208,10 +240,17 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
             networkRunner = FindFirstObjectByType<NetworkRunner>();
         }
 
-        if (networkRunner == null)
+        if (networkRunner == null || !networkRunner.IsRunning)
         {
             return;
         }
+
+        if (registeredRunner == networkRunner)
+        {
+            return;
+        }
+
+        UnregisterNetworkCallbacks();
 
         networkRunner.RemoveCallbacks(this);
         networkRunner.AddCallbacks(this);
@@ -221,6 +260,13 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
         {
             TrySpawnActiveNetworkPlayers(registeredRunner, true);
         }
+    }
+
+    private void HandleRunnerReady(NetworkRunner readyRunner)
+    {
+        // StartGame 성공이 확인된 Runner만 등록해 초기화 도중의 Runner 사용을 막습니다.
+        networkRunner = readyRunner;
+        TryRegisterNetworkCallbacks();
     }
 
     private void UnregisterNetworkCallbacks()

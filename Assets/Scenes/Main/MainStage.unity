@@ -592,6 +592,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1870447630571272332, guid: 057bf84c38c416b48af5ae30308d0b9f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8614658857044615311}
+    - targetCorrespondingSourceObject: {fileID: 1870447630571272332, guid: 057bf84c38c416b48af5ae30308d0b9f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8614658857044615312}
   m_SourcePrefab: {fileID: 100100000, guid: 057bf84c38c416b48af5ae30308d0b9f, type: 3}
 --- !u!1 &8614658857044615308 stripped
 GameObject:
@@ -673,6 +676,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da1fe96a32200db4b921f9560efafead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NetworkInputManager
+--- !u!114 &8614658857044615312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8614658857044615308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8bd20888e24d79a06c1529d035ab26, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MainStageBootstrap
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
