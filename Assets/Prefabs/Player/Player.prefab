@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8858391721762176390}
   - component: {fileID: 1505710363900841254}
   - component: {fileID: 3360425608349917206}
+  - component: {fileID: -5153323484208059909}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -61,6 +62,7 @@ MonoBehaviour:
   - {fileID: 8858391721762176390}
   - {fileID: 1505710363900841254}
   - {fileID: 3360425608349917206}
+  - {fileID: -5153323484208059909}
   - {fileID: 5793472693874079596}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &684427438748064101
@@ -184,6 +186,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdd5a227ae48264790316f6d13bec83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+--- !u!114 &-5153323484208059909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24278698455303069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5790857574487a47876acd83ef731c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractionHandler
+  checkRange: 2
 --- !u!1 &151144313392193410
 GameObject:
   m_ObjectHideFlags: 0

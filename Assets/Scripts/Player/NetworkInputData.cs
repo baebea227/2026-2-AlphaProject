@@ -5,4 +5,5 @@ public struct NetworkInputData : INetworkInput
 {
     public Vector2 moveInput;
     public NetworkBool isSprinting;
+    public NetworkBool isInteract;
 }

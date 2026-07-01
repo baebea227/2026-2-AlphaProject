@@ -3,7 +3,6 @@ using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static Unity.Collections.Unicode;
 
 public class NetworkInputManager : MonoBehaviour, INetworkRunnerCallbacks
 {
