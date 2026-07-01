@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-public enum PlayerSpawnBackend
+public enum PlayerSpawnMode
 {
     LocalInstantiate,
     FusionNetwork
 }
 
-public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallbacks
+public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallbacks
 {
     private static readonly Vector3[] SinglePointSpawnOffsets =
     {
@@ -22,8 +23,9 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     [Header("Spawn Mode")]
     [Tooltip("플레이어를 생성할 방식을 선택합니다.")]
-    [SerializeField] private PlayerSpawnBackend spawnBackend = PlayerSpawnBackend.LocalInstantiate;
-    [Tooltip("메인 스테이지 매니저가 시작될 때 자동으로 플레이어를 생성합니다.")]
+    [FormerlySerializedAs("spawnBackend")]
+    [SerializeField] private PlayerSpawnMode spawnMode = PlayerSpawnMode.LocalInstantiate;
+    [Tooltip("인게임 매니저가 시작될 때 자동으로 플레이어를 생성합니다.")]
     [SerializeField] private bool spawnOnStart = true;
 
     [Header("Local Spawn")]
@@ -51,7 +53,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     private readonly List<GameObject> spawnedLocalPlayers = new List<GameObject>();
     private readonly Dictionary<PlayerRef, NetworkObject> spawnedNetworkPlayers = new Dictionary<PlayerRef, NetworkObject>();
 
-    private MainStageBootstrap runnerBootstrap;
+    private InGameBootstrap runnerBootstrap;
     private NetworkRunner registeredRunner;
 
     public IReadOnlyList<GameObject> SpawnedLocalPlayers
@@ -61,13 +63,13 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void OnEnable()
     {
-        if (spawnBackend != PlayerSpawnBackend.FusionNetwork)
+        if (spawnMode != PlayerSpawnMode.FusionNetwork)
         {
             return;
         }
 
         // 테스트 씬의 부트스트랩이 있으면 Runner 준비 완료 이벤트를 우선 기다립니다.
-        runnerBootstrap = FindFirstObjectByType<MainStageBootstrap>();
+        runnerBootstrap = FindFirstObjectByType<InGameBootstrap>();
         if (runnerBootstrap != null)
         {
             runnerBootstrap.RunnerReady -= HandleRunnerReady;
@@ -81,22 +83,22 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
             return;
         }
 
-        // 로비를 거쳐 MainStage에 들어온 경우 이미 실행 중인 Runner를 바로 사용합니다.
+        // 로비를 거쳐 InGame에 들어온 경우 이미 실행 중인 Runner를 바로 사용합니다.
         TryRegisterNetworkCallbacks();
     }
 
     private void Start()
     {
-        if (spawnBackend == PlayerSpawnBackend.FusionNetwork && runnerBootstrap == null)
+        if (spawnMode == PlayerSpawnMode.FusionNetwork && runnerBootstrap == null)
         {
             TryRegisterNetworkCallbacks();
         }
 
-        if (spawnBackend == PlayerSpawnBackend.LocalInstantiate && spawnOnStart)
+        if (spawnMode == PlayerSpawnMode.LocalInstantiate && spawnOnStart)
         {
             SpawnLocalPlayers();
         }
-        else if (spawnBackend == PlayerSpawnBackend.FusionNetwork && spawnOnStart)
+        else if (spawnMode == PlayerSpawnMode.FusionNetwork && spawnOnStart)
         {
             TrySpawnActiveNetworkPlayers(registeredRunner, true);
         }
@@ -140,13 +142,13 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     {
         if (playerIndex < 0)
         {
-            Debug.LogError($"{nameof(StagePlayerSpawnManager)}: 플레이어 인덱스는 0보다 작을 수 없습니다.", this);
+            Debug.LogError($"{nameof(InGamePlayerSpawnManager)}: 플레이어 인덱스는 0보다 작을 수 없습니다.", this);
             return null;
         }
 
         if (localPlayerPrefab == null)
         {
-            Debug.LogError($"{nameof(StagePlayerSpawnManager)}: 로컬 플레이어 프리팹이 연결되지 않았습니다.", this);
+            Debug.LogError($"{nameof(InGamePlayerSpawnManager)}: 로컬 플레이어 프리팹이 연결되지 않았습니다.", this);
             return null;
         }
 
@@ -180,13 +182,13 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
     {
         if (runner == null)
         {
-            Debug.LogError($"{nameof(StagePlayerSpawnManager)}: NetworkRunner가 연결되지 않았습니다.", this);
+            Debug.LogError($"{nameof(InGamePlayerSpawnManager)}: NetworkRunner가 연결되지 않았습니다.", this);
             return null;
         }
 
         if (networkPlayerPrefab == null)
         {
-            Debug.LogError($"{nameof(StagePlayerSpawnManager)}: 네트워크 플레이어 프리팹이 연결되지 않았습니다.", this);
+            Debug.LogError($"{nameof(InGamePlayerSpawnManager)}: 네트워크 플레이어 프리팹이 연결되지 않았습니다.", this);
             return null;
         }
 
@@ -230,7 +232,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void TryRegisterNetworkCallbacks()
     {
-        if (spawnBackend != PlayerSpawnBackend.FusionNetwork)
+        if (spawnMode != PlayerSpawnMode.FusionNetwork)
         {
             return;
         }
@@ -295,7 +297,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     private void TrySpawnActiveNetworkPlayers(NetworkRunner runner, bool requireSceneReady)
     {
-        if (spawnBackend != PlayerSpawnBackend.FusionNetwork || !CanSpawnNetworkPlayers(runner))
+        if (spawnMode != PlayerSpawnMode.FusionNetwork || !CanSpawnNetworkPlayers(runner))
         {
             return;
         }
@@ -341,7 +343,7 @@ public sealed class StagePlayerSpawnManager : MonoBehaviour, INetworkRunnerCallb
 
     void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        if (spawnBackend != PlayerSpawnBackend.FusionNetwork || !CanSpawnNetworkPlayers(runner))
+        if (spawnMode != PlayerSpawnMode.FusionNetwork || !CanSpawnNetworkPlayers(runner))
         {
             return;
         }

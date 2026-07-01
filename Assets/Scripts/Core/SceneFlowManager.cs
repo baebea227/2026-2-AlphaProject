@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 
 public enum SceneId
 {
-    Lobby,
-    MainStage
+    Lobby = 0,
+    InGame = 1,
+    Bootstrap = 2,
+    MainMenu = 3
 }
 
 public sealed class SceneFlowManager : MonoBehaviour
@@ -31,20 +33,30 @@ public sealed class SceneFlowManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void LoadBootstrap()
+    {
+        LoadScene(SceneId.Bootstrap);
+    }
+
+    public void LoadMainMenu()
+    {
+        LoadScene(SceneId.MainMenu);
+    }
+
     public void LoadLobby()
     {
         LoadScene(SceneId.Lobby);
     }
 
-    public void LoadMainStage()
+    public void LoadInGame()
     {
-        LoadScene(SceneId.MainStage);
+        LoadScene(SceneId.InGame);
     }
 
-    public bool LoadNetworkMainStage(NetworkRunner runner)
+    public bool LoadNetworkInGame(NetworkRunner runner)
     {
-        // Fusion의 씬 권한을 가진 Host가 MainStage를 로드하면 같은 세션의 참가자에게 전환이 동기화됩니다.
-        return LoadNetworkScene(runner, SceneId.MainStage);
+        // Fusion의 씬 권한을 가진 Host가 InGame을 로드하면 같은 세션의 참가자에게 전환이 동기화됩니다.
+        return LoadNetworkScene(runner, SceneId.InGame);
     }
 
     public void LoadScene(SceneId sceneId)
@@ -126,10 +138,14 @@ public sealed class SceneFlowManager : MonoBehaviour
     {
         switch (sceneId)
         {
+            case SceneId.Bootstrap:
+                return "Bootstrap";
+            case SceneId.MainMenu:
+                return "MainMenu";
             case SceneId.Lobby:
                 return "Lobby";
-            case SceneId.MainStage:
-                return "MainStage";
+            case SceneId.InGame:
+                return "InGame";
             default:
                 throw new ArgumentOutOfRangeException(nameof(sceneId), sceneId, null);
         }
