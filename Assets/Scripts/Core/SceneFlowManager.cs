@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 
 public enum SceneId
 {
-    Lobby,
-    InGame
+    Lobby = 0,
+    InGame = 1,
+    Bootstrap = 2,
+    MainMenu = 3
 }
 
 public sealed class SceneFlowManager : MonoBehaviour
@@ -29,6 +31,16 @@ public sealed class SceneFlowManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void LoadBootstrap()
+    {
+        LoadScene(SceneId.Bootstrap);
+    }
+
+    public void LoadMainMenu()
+    {
+        LoadScene(SceneId.MainMenu);
     }
 
     public void LoadLobby()
@@ -126,6 +138,10 @@ public sealed class SceneFlowManager : MonoBehaviour
     {
         switch (sceneId)
         {
+            case SceneId.Bootstrap:
+                return "Bootstrap";
+            case SceneId.MainMenu:
+                return "MainMenu";
             case SceneId.Lobby:
                 return "Lobby";
             case SceneId.InGame:
