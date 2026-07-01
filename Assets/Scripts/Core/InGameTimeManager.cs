@@ -1,20 +1,20 @@
 using System;
 using UnityEngine;
 
-public enum StageTimePhase
+public enum InGameTimePhase
 {
     Day,
     Dusk,
     Night
 }
 
-public sealed class StageTimeManager : MonoBehaviour
+public sealed class InGameTimeManager : MonoBehaviour
 {
     private const float HoursPerDay = 24f;
     private const int MinutesPerDay = 24 * 60;
 
     [Header("Clock")]
-    [Tooltip("활성화하면 스테이지 시작 시 시간이 자동으로 흐릅니다.")]
+    [Tooltip("활성화하면 인게임 시작 시 시간이 자동으로 흐릅니다.")]
     [SerializeField] private bool playOnStart = true;
     [Tooltip("낮 단계가 지속되는 실제 초입니다.")]
     [Min(0f)]
@@ -24,7 +24,7 @@ public sealed class StageTimeManager : MonoBehaviour
     [SerializeField] private float duskDurationSeconds = 120f;
 
     [Header("Display Time")]
-    [Tooltip("스테이지 시작 시 표시할 인게임 시각입니다.")]
+    [Tooltip("인게임 시작 시 표시할 시각입니다.")]
     [Range(0f, 24f)]
     [SerializeField] private float dayStartHour = 6f;
     [Tooltip("밤이 시작될 때 표시할 인게임 시각입니다.")]
@@ -39,7 +39,7 @@ public sealed class StageTimeManager : MonoBehaviour
 
     public float ElapsedSeconds { get; private set; }
     public bool IsRunning { get; private set; }
-    public StageTimePhase CurrentPhase { get; private set; }
+    public InGameTimePhase CurrentPhase { get; private set; }
     public float DayDurationSeconds { get { return dayDurationSeconds; } }
     public float SecondsUntilNightStart { get { return dayDurationSeconds + duskDurationSeconds; } }
     public float SecondsUntilMaxDanger { get { return SecondsUntilNightStart + nightEscalationDurationSeconds; } }
@@ -99,7 +99,7 @@ public sealed class StageTimeManager : MonoBehaviour
         {
             float hourDeltaUntilNight = GetPositiveHourDelta(dayStartHour, nightStartHour);
             float hoursPerSecond = GetHoursPerSecond(hourDeltaUntilNight);
-            float elapsedGameHours = CurrentPhase == StageTimePhase.Night
+            float elapsedGameHours = CurrentPhase == InGameTimePhase.Night
                 ? hourDeltaUntilNight + NightElapsedSeconds * hoursPerSecond
                 : hourDeltaUntilNight * DayNightProgress;
 
@@ -124,7 +124,7 @@ public sealed class StageTimeManager : MonoBehaviour
         }
     }
 
-    public event Action<StageTimePhase> PhaseChanged;
+    public event Action<InGameTimePhase> PhaseChanged;
     public event Action<float, float> TimeUpdated;
 
     private void Awake()
@@ -195,7 +195,7 @@ public sealed class StageTimeManager : MonoBehaviour
 
     public void SetElapsedSeconds(float seconds)
     {
-        StageTimePhase previousPhase = CurrentPhase;
+        InGameTimePhase previousPhase = CurrentPhase;
 
         ElapsedSeconds = Mathf.Max(0f, seconds);
         RefreshPhase();
@@ -213,19 +213,19 @@ public sealed class StageTimeManager : MonoBehaviour
         CurrentPhase = CalculatePhase();
     }
 
-    private StageTimePhase CalculatePhase()
+    private InGameTimePhase CalculatePhase()
     {
         if (ElapsedSeconds < DayDurationSeconds)
         {
-            return StageTimePhase.Day;
+            return InGameTimePhase.Day;
         }
 
         if (ElapsedSeconds < SecondsUntilNightStart)
         {
-            return StageTimePhase.Dusk;
+            return InGameTimePhase.Dusk;
         }
 
-        return StageTimePhase.Night;
+        return InGameTimePhase.Night;
     }
 
     private float GetHoursPerSecond(float hourDeltaUntilNight)

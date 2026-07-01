@@ -5,9 +5,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// MainStage를 직접 실행했을 때 개발용 Single Runner를 준비합니다.
+/// InGame을 직접 실행했을 때 개발용 Single Runner를 준비합니다.
 /// </summary>
-public sealed class MainStageBootstrap : MonoBehaviour
+public sealed class InGameBootstrap : MonoBehaviour
 {
     public NetworkRunner Runner { get; private set; }
     public bool IsRunnerReady { get; private set; }
@@ -29,7 +29,7 @@ public sealed class MainStageBootstrap : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"{nameof(MainStageBootstrap)}: 기존 Runner가 아직 실행 준비되지 않았습니다.", this);
+                Debug.LogWarning($"{nameof(InGameBootstrap)}: 기존 Runner가 아직 실행 준비되지 않았습니다.", this);
             }
 
             return;
@@ -41,7 +41,7 @@ public sealed class MainStageBootstrap : MonoBehaviour
     private async Task StartSinglePlayerRunnerAsync()
     {
         // Fusion이 DontDestroyOnLoad를 적용할 수 있도록 Runner를 루트 GameObject로 생성합니다.
-        GameObject runnerObject = new GameObject("MainStageSinglePlayerRunner");
+        GameObject runnerObject = new GameObject("InGameSinglePlayerRunner");
         createdRunner = runnerObject.AddComponent<NetworkRunner>();
         createdRunner.ProvideInput = true;
 
@@ -54,7 +54,7 @@ public sealed class MainStageBootstrap : MonoBehaviour
 
         if (activeSceneRef.IsValid)
         {
-            // 이미 열린 MainStage를 Single Runner의 초기 네트워크 씬으로 등록합니다.
+            // 이미 열린 InGame을 Single Runner의 초기 네트워크 씬으로 등록합니다.
             sceneInfo.AddSceneRef(activeSceneRef, LoadSceneMode.Additive);
         }
 
@@ -70,7 +70,7 @@ public sealed class MainStageBootstrap : MonoBehaviour
 
             if (!result.Ok)
             {
-                Debug.LogError($"{nameof(MainStageBootstrap)}: Single Runner를 시작하지 못했습니다. ({result.ShutdownReason})", this);
+                Debug.LogError($"{nameof(InGameBootstrap)}: Single Runner를 시작하지 못했습니다. ({result.ShutdownReason})", this);
                 DestroyCreatedRunner();
                 return;
             }
