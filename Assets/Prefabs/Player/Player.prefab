@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8858391721762176390}
   - component: {fileID: 1505710363900841254}
   - component: {fileID: 3360425608349917206}
+  - component: {fileID: 7029184652107733184}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -184,6 +185,76 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcdd5a227ae48264790316f6d13bec83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+--- !u!114 &7029184652107733184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 24278698455303069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3d4f67c8e9a4f64aa9a177c5527e2be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVisionController
+  timeManager: {fileID: 0}
+  localCamera: {fileID: 0}
+  overlayMaterialTemplate: {fileID: 2100000, guid: c4f8369d2b6c4c6887f22d4b84221711, type: 2}
+  dayDistance: 18
+  duskDistance: 12
+  nightDistance: 6
+  dayAngle: 140
+  duskAngle: 100
+  nightAngle: 60
+  nearVisionRadius: 2.4
+  flashlightDistance: 9
+  flashlightAngle: 55
+  flashlightEnabled: 0
+  darknessAlphaByProgress:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.12
+      inSlope: 0
+      outSlope: 0.21333334
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.75
+      value: 0.28
+      inSlope: 0.21333334
+      outSlope: 1.8000002
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.9
+      value: 0.55
+      inSlope: 1.8000002
+      outSlope: 2.6999998
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.82
+      inSlope: 2.6999998
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  softness: 1.5
+  createRuntimeLights: 1
+  flashlightIntensity: 2.2
 --- !u!1 &151144313392193410
 GameObject:
   m_ObjectHideFlags: 0
