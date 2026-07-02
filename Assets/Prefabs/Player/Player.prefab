@@ -210,6 +210,8 @@ MonoBehaviour:
   flashlightDistance: 9
   flashlightAngle: 55
   flashlightEnabled: 0
+  maxEnvironmentVisionLights: 16
+  environmentVisionSearchRadius: 30
   darknessAlphaByProgress:
     serializedVersion: 2
     m_Curve:

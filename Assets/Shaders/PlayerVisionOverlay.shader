@@ -27,6 +27,7 @@ Shader "AlphaProject/PlayerVisionOverlay"
             #pragma fragment Frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #define MAX_ENVIRONMENT_VISION_LIGHTS 16
 
             struct Attributes
             {
@@ -51,6 +52,8 @@ Shader "AlphaProject/PlayerVisionOverlay"
                 float _FlashlightEnabled;
                 float _FlashlightDistance;
                 float _FlashlightAngle;
+                int _EnvironmentVisionLightCount;
+                float4 _EnvironmentVisionLightData[MAX_ENVIRONMENT_VISION_LIGHTS];
                 float _DarknessAlpha;
                 float _Softness;
                 float _GroundY;
@@ -115,7 +118,26 @@ Shader "AlphaProject/PlayerVisionOverlay"
                     distanceToPoint);
                 float flashlightVisible = _FlashlightEnabled * flashlightAngleVisible * flashlightRangeVisible;
 
-                float visible = saturate(max(max(nearVisible, baseAngleVisible * baseRangeVisible), flashlightVisible));
+                float environmentVisible = 0.0;
+                [unroll]
+                for (int i = 0; i < MAX_ENVIRONMENT_VISION_LIGHTS; i++)
+                {
+                    if (i >= _EnvironmentVisionLightCount)
+                    {
+                        break;
+                    }
+
+                    float4 lightData = _EnvironmentVisionLightData[i];
+                    float2 toLight = groundPosition.xz - lightData.xy;
+                    float lightDistance = length(toLight);
+                    float lightVisible = 1.0 - smoothstep(
+                        max(0.0, lightData.z - _Softness),
+                        lightData.z,
+                        lightDistance);
+                    environmentVisible = max(environmentVisible, lightVisible * saturate(lightData.w));
+                }
+
+                float visible = saturate(max(max(nearVisible, baseAngleVisible * baseRangeVisible), max(flashlightVisible, environmentVisible)));
                 float alpha = saturate(_DarknessAlpha * (1.0 - visible));
                 return half4(_DarkColor.rgb, alpha);
             }

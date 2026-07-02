@@ -3,6 +3,8 @@ using UnityEngine;
 
 public sealed class PlayerVisionController : MonoBehaviour
 {
+    private const int MaxEnvironmentVisionLightCount = 16;
+
     private static readonly int PlayerPositionId = Shader.PropertyToID("_PlayerPosition");
     private static readonly int ViewForwardId = Shader.PropertyToID("_ViewForwardXZ");
     private static readonly int ViewDistanceId = Shader.PropertyToID("_ViewDistance");
@@ -11,6 +13,8 @@ public sealed class PlayerVisionController : MonoBehaviour
     private static readonly int FlashlightEnabledId = Shader.PropertyToID("_FlashlightEnabled");
     private static readonly int FlashlightDistanceId = Shader.PropertyToID("_FlashlightDistance");
     private static readonly int FlashlightAngleId = Shader.PropertyToID("_FlashlightAngle");
+    private static readonly int EnvironmentVisionLightCountId = Shader.PropertyToID("_EnvironmentVisionLightCount");
+    private static readonly int EnvironmentVisionLightDataId = Shader.PropertyToID("_EnvironmentVisionLightData");
     private static readonly int DarknessAlphaId = Shader.PropertyToID("_DarknessAlpha");
     private static readonly int SoftnessId = Shader.PropertyToID("_Softness");
     private static readonly int GroundYId = Shader.PropertyToID("_GroundY");
@@ -53,6 +57,14 @@ public sealed class PlayerVisionController : MonoBehaviour
     [Tooltip("장비 시스템이 붙기 전까지 Inspector에서 손전등 테스트에 사용합니다.")]
     [SerializeField] private bool flashlightEnabled;
 
+    [Header("Environment Vision")]
+    [Tooltip("시야 마스크에 반영할 주변 환경 광원의 최대 개수입니다.")]
+    [Range(0, MaxEnvironmentVisionLightCount)]
+    [SerializeField] private int maxEnvironmentVisionLights = MaxEnvironmentVisionLightCount;
+    [Tooltip("플레이어 주변 환경 광원을 수집할 거리입니다.")]
+    [Min(0f)]
+    [SerializeField] private float environmentVisionSearchRadius = 30f;
+
     [Header("Overlay")]
     [Tooltip("낮에서 밤까지의 진행도에 따라 적용할 어둠 오버레이 알파입니다.")]
     [SerializeField] private AnimationCurve darknessAlphaByProgress = CreateDefaultDarknessCurve();
@@ -69,6 +81,8 @@ public sealed class PlayerVisionController : MonoBehaviour
     private Material overlayMaterialInstance;
     private GameObject overlayObject;
     private Light flashlightLight;
+    private readonly Vector4[] environmentVisionLightData = new Vector4[MaxEnvironmentVisionLightCount];
+    private int environmentVisionLightCount;
     private bool isVisionActive;
 
     private void Awake()
@@ -105,6 +119,7 @@ public sealed class PlayerVisionController : MonoBehaviour
         float viewAngle = GetCurrentBaseViewAngle(progress);
         float darknessAlpha = Mathf.Clamp01(darknessAlphaByProgress.Evaluate(progress));
 
+        CollectEnvironmentVisionLights();
         UpdateOverlayMaterial(viewDistance, viewAngle, darknessAlpha);
         UpdateRuntimeLights();
     }
@@ -138,6 +153,8 @@ public sealed class PlayerVisionController : MonoBehaviour
         nearVisionRadius = Mathf.Max(0f, nearVisionRadius);
         flashlightDistance = Mathf.Max(0f, flashlightDistance);
         flashlightAngle = Mathf.Clamp(flashlightAngle, 1f, 180f);
+        maxEnvironmentVisionLights = Mathf.Clamp(maxEnvironmentVisionLights, 0, MaxEnvironmentVisionLightCount);
+        environmentVisionSearchRadius = Mathf.Max(0f, environmentVisionSearchRadius);
         softness = Mathf.Max(0.01f, softness);
         flashlightIntensity = Mathf.Max(0f, flashlightIntensity);
 
@@ -167,6 +184,11 @@ public sealed class PlayerVisionController : MonoBehaviour
         Vector3 direction = toPoint.normalized;
 
         if (IsInsideVisionCone(direction, sqrDistance, forward, viewDistance, viewAngle))
+        {
+            return true;
+        }
+
+        if (IsVisibleByEnvironmentLight(worldPoint))
         {
             return true;
         }
@@ -343,6 +365,8 @@ public sealed class PlayerVisionController : MonoBehaviour
         overlayMaterialInstance.SetFloat(FlashlightEnabledId, flashlightEnabled ? 1f : 0f);
         overlayMaterialInstance.SetFloat(FlashlightDistanceId, Mathf.Max(0.01f, flashlightDistance));
         overlayMaterialInstance.SetFloat(FlashlightAngleId, flashlightAngle);
+        overlayMaterialInstance.SetInt(EnvironmentVisionLightCountId, environmentVisionLightCount);
+        overlayMaterialInstance.SetVectorArray(EnvironmentVisionLightDataId, environmentVisionLightData);
         overlayMaterialInstance.SetFloat(DarknessAlphaId, darknessAlpha);
         overlayMaterialInstance.SetFloat(SoftnessId, softness);
         overlayMaterialInstance.SetFloat(GroundYId, transform.position.y);
@@ -371,6 +395,133 @@ public sealed class PlayerVisionController : MonoBehaviour
             flashlightLight.spotAngle = flashlightAngle;
             flashlightLight.intensity = flashlightEnabled ? flashlightIntensity * nightWeight : 0f;
         }
+    }
+
+    private void CollectEnvironmentVisionLights()
+    {
+        environmentVisionLightCount = 0;
+        ClearEnvironmentVisionLightData();
+
+        int sourceCount = VisionLightSource.ActiveSourceCount;
+        if (maxEnvironmentVisionLights <= 0 || sourceCount <= 0)
+        {
+            return;
+        }
+
+        float searchSqrDistance = environmentVisionSearchRadius * environmentVisionSearchRadius;
+        for (int i = 0; i < sourceCount; i++)
+        {
+            VisionLightSource source = VisionLightSource.GetActiveSource(i);
+            if (!IsValidEnvironmentVisionLight(source))
+            {
+                continue;
+            }
+
+            Vector3 toSource = source.Position - transform.position;
+            toSource.y = 0f;
+            if (toSource.sqrMagnitude > searchSqrDistance)
+            {
+                continue;
+            }
+
+            AddEnvironmentVisionLight(source);
+        }
+    }
+
+    private void AddEnvironmentVisionLight(VisionLightSource source)
+    {
+        Vector4 lightData = new Vector4(
+            source.Position.x,
+            source.Position.z,
+            source.VisionRadius,
+            source.VisionIntensity);
+
+        if (environmentVisionLightCount < maxEnvironmentVisionLights)
+        {
+            environmentVisionLightData[environmentVisionLightCount] = lightData;
+            environmentVisionLightCount++;
+            return;
+        }
+
+        int farthestIndex = FindFarthestEnvironmentVisionLightIndex();
+        if (farthestIndex < 0)
+        {
+            return;
+        }
+
+        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.z);
+        Vector2 sourcePosition = new Vector2(lightData.x, lightData.y);
+        Vector2 farthestPosition = new Vector2(
+            environmentVisionLightData[farthestIndex].x,
+            environmentVisionLightData[farthestIndex].y);
+
+        if ((sourcePosition - playerPosition).sqrMagnitude < (farthestPosition - playerPosition).sqrMagnitude)
+        {
+            environmentVisionLightData[farthestIndex] = lightData;
+        }
+    }
+
+    private int FindFarthestEnvironmentVisionLightIndex()
+    {
+        if (environmentVisionLightCount <= 0)
+        {
+            return -1;
+        }
+
+        int farthestIndex = 0;
+        float farthestSqrDistance = -1f;
+        Vector2 playerPosition = new Vector2(transform.position.x, transform.position.z);
+
+        for (int i = 0; i < environmentVisionLightCount; i++)
+        {
+            Vector2 lightPosition = new Vector2(environmentVisionLightData[i].x, environmentVisionLightData[i].y);
+            float sqrDistance = (lightPosition - playerPosition).sqrMagnitude;
+            if (sqrDistance > farthestSqrDistance)
+            {
+                farthestSqrDistance = sqrDistance;
+                farthestIndex = i;
+            }
+        }
+
+        return farthestIndex;
+    }
+
+    private void ClearEnvironmentVisionLightData()
+    {
+        for (int i = 0; i < environmentVisionLightData.Length; i++)
+        {
+            environmentVisionLightData[i] = Vector4.zero;
+        }
+    }
+
+    private bool IsVisibleByEnvironmentLight(Vector3 worldPoint)
+    {
+        int sourceCount = VisionLightSource.ActiveSourceCount;
+        for (int i = 0; i < sourceCount; i++)
+        {
+            VisionLightSource source = VisionLightSource.GetActiveSource(i);
+            if (!IsValidEnvironmentVisionLight(source))
+            {
+                continue;
+            }
+
+            Vector3 toPoint = worldPoint - source.Position;
+            toPoint.y = 0f;
+            if (toPoint.sqrMagnitude <= source.VisionRadius * source.VisionRadius)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsValidEnvironmentVisionLight(VisionLightSource source)
+    {
+        return source != null &&
+            source.IsLit &&
+            source.VisionRadius > 0f &&
+            source.VisionIntensity > 0f;
     }
 
     private float GetDayNightProgress()
