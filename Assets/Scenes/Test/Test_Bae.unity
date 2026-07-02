@@ -2910,6 +2910,7 @@ GameObject:
   - component: {fileID: 920000000000000132}
   - component: {fileID: 920000000000000133}
   - component: {fileID: 920000000000000134}
+  - component: {fileID: 920000000000000170}
   m_Layer: 0
   m_Name: Transition_Garden_To_Mansion1F
   m_TagString: Untagged
@@ -2925,13 +2926,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920000000000000130}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.25, z: -8}
-  m_LocalScale: {x: 3, y: 2.5, z: 0.35}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 0, y: 0.25, z: -8.5}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &920000000000000132
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3022,6 +3023,7 @@ GameObject:
   - component: {fileID: 920000000000000137}
   - component: {fileID: 920000000000000138}
   - component: {fileID: 920000000000000139}
+  - component: {fileID: 920000000000000171}
   m_Layer: 0
   m_Name: Transition_Mansion1F_To_Garden
   m_TagString: Untagged
@@ -3038,8 +3040,8 @@ Transform:
   m_GameObject: {fileID: 920000000000000135}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.25, z: -5}
-  m_LocalScale: {x: 3, y: 2.5, z: 0.35}
+  m_LocalPosition: {x: 0, y: 0.25, z: -4.5}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
@@ -3134,6 +3136,7 @@ GameObject:
   - component: {fileID: 920000000000000142}
   - component: {fileID: 920000000000000143}
   - component: {fileID: 920000000000000144}
+  - component: {fileID: 920000000000000172}
   m_Layer: 0
   m_Name: Transition_Mansion1F_To_Basement
   m_TagString: Untagged
@@ -3149,13 +3152,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920000000000000140}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: 1.25, z: 3}
-  m_LocalScale: {x: 0.35, y: 2.5, z: 2}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -4.5, y: 0.25, z: 3}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &920000000000000142
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3246,6 +3249,7 @@ GameObject:
   - component: {fileID: 920000000000000147}
   - component: {fileID: 920000000000000148}
   - component: {fileID: 920000000000000149}
+  - component: {fileID: 920000000000000173}
   m_Layer: 0
   m_Name: Transition_Basement_To_Mansion1F
   m_TagString: Untagged
@@ -3261,13 +3265,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920000000000000145}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16, y: 1.25, z: -3.5}
-  m_LocalScale: {x: 2, y: 2.5, z: 0.35}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -13, y: 0.25, z: -0.01}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!33 &920000000000000147
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3358,6 +3362,7 @@ GameObject:
   - component: {fileID: 920000000000000152}
   - component: {fileID: 920000000000000153}
   - component: {fileID: 920000000000000154}
+  - component: {fileID: 920000000000000174}
   m_Layer: 0
   m_Name: Transition_Mansion1F_To_SecondFloor
   m_TagString: Untagged
@@ -3373,13 +3378,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920000000000000150}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 1.25, z: 3}
-  m_LocalScale: {x: 0.35, y: 2.5, z: 2}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 4.5, y: 0.25, z: 3}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!33 &920000000000000152
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3470,6 +3475,7 @@ GameObject:
   - component: {fileID: 920000000000000157}
   - component: {fileID: 920000000000000158}
   - component: {fileID: 920000000000000159}
+  - component: {fileID: 920000000000000175}
   m_Layer: 0
   m_Name: Transition_SecondFloor_To_Mansion1F
   m_TagString: Untagged
@@ -3485,13 +3491,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920000000000000155}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16, y: 1.25, z: -3.5}
-  m_LocalScale: {x: 2, y: 2.5, z: 0.35}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 13, y: 0.25, z: -0.05}
+  m_LocalScale: {x: 1, y: 0.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 920000000000000014}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!33 &920000000000000157
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3682,6 +3688,108 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &920000000000000170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000136}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
+--- !u!114 &920000000000000171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000131}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
+--- !u!114 &920000000000000172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000146}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
+--- !u!114 &920000000000000173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000141}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
+--- !u!114 &920000000000000174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000156}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
+--- !u!114 &920000000000000175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920000000000000155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12d76c5ffca24f6c83181b9f56c7ebec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AreaTransition
+  destination: {fileID: 920000000000000151}
+  arrivalDistance: 1.5
+  arrivalHeight: 0
+  teleportCooldown: 0.5
+  matchDestinationRotation: 0
 --- !u!1001 &8614658857044615307
 PrefabInstance:
   m_ObjectHideFlags: 0
