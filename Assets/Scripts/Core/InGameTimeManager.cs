@@ -37,6 +37,11 @@ public sealed class InGameTimeManager : MonoBehaviour
     [SerializeField] private float nightEscalationDurationSeconds = 600f;
     [SerializeField] private AnimationCurve dangerCurve = AnimationCurve.Linear(0f, 1f, 1f, 2f);
 
+    [Header("Debug")]
+    [Tooltip("Play Mode에서 값을 움직이면 현재 시간이 바뀌고, 시간이 흐르면 이 값도 함께 갱신됩니다.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float inspectorTimeProgress;
+
     public float ElapsedSeconds { get; private set; }
     public bool IsRunning { get; private set; }
     public InGameTimePhase CurrentPhase { get; private set; }
@@ -72,6 +77,29 @@ public sealed class InGameTimeManager : MonoBehaviour
             }
 
             return Mathf.Clamp01(ElapsedSeconds / secondsUntilNight);
+        }
+    }
+
+    public float DuskProgress
+    {
+        get
+        {
+            if (CurrentPhase == InGameTimePhase.Day)
+            {
+                return 0f;
+            }
+
+            if (CurrentPhase == InGameTimePhase.Night)
+            {
+                return 1f;
+            }
+
+            if (duskDurationSeconds <= 0f)
+            {
+                return 1f;
+            }
+
+            return Mathf.Clamp01((ElapsedSeconds - DayDurationSeconds) / duskDurationSeconds);
         }
     }
 
@@ -127,9 +155,12 @@ public sealed class InGameTimeManager : MonoBehaviour
     public event Action<InGameTimePhase> PhaseChanged;
     public event Action<float, float> TimeUpdated;
 
+    private float previousInspectorTimeProgress;
+
     private void Awake()
     {
         RefreshPhase();
+        SyncInspectorTimeProgress();
     }
 
     private void Start()
@@ -142,8 +173,14 @@ public sealed class InGameTimeManager : MonoBehaviour
 
     private void Update()
     {
+        if (TryApplyInspectorTimeProgress())
+        {
+            return;
+        }
+
         if (!IsRunning)
         {
+            SyncInspectorTimeProgress();
             return;
         }
 
@@ -155,6 +192,7 @@ public sealed class InGameTimeManager : MonoBehaviour
         dayDurationSeconds = Mathf.Max(0f, dayDurationSeconds);
         duskDurationSeconds = Mathf.Max(0f, duskDurationSeconds);
         nightEscalationDurationSeconds = Mathf.Max(0f, nightEscalationDurationSeconds);
+        inspectorTimeProgress = Mathf.Clamp01(inspectorTimeProgress);
         dayStartHour = WrapHour(dayStartHour);
         nightStartHour = WrapHour(nightStartHour);
 
@@ -199,6 +237,7 @@ public sealed class InGameTimeManager : MonoBehaviour
 
         ElapsedSeconds = Mathf.Max(0f, seconds);
         RefreshPhase();
+        SyncInspectorTimeProgress();
 
         if (CurrentPhase != previousPhase)
         {
@@ -206,6 +245,39 @@ public sealed class InGameTimeManager : MonoBehaviour
         }
 
         TimeUpdated?.Invoke(ElapsedSeconds, DayNightProgress);
+    }
+
+    private bool TryApplyInspectorTimeProgress()
+    {
+        float clampedProgress = Mathf.Clamp01(inspectorTimeProgress);
+        if (!Mathf.Approximately(inspectorTimeProgress, clampedProgress))
+        {
+            inspectorTimeProgress = clampedProgress;
+        }
+
+        if (Mathf.Approximately(inspectorTimeProgress, previousInspectorTimeProgress))
+        {
+            return false;
+        }
+
+        float inspectableDuration = SecondsUntilMaxDanger;
+        if (inspectableDuration <= 0f)
+        {
+            SetElapsedSeconds(0f);
+            return true;
+        }
+
+        SetElapsedSeconds(inspectableDuration * inspectorTimeProgress);
+        return true;
+    }
+
+    private void SyncInspectorTimeProgress()
+    {
+        float inspectableDuration = SecondsUntilMaxDanger;
+        inspectorTimeProgress = inspectableDuration <= 0f
+            ? 0f
+            : Mathf.Clamp01(ElapsedSeconds / inspectableDuration);
+        previousInspectorTimeProgress = inspectorTimeProgress;
     }
 
     private void RefreshPhase()
