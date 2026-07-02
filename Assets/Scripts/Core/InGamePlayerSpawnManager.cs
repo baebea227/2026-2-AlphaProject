@@ -24,14 +24,14 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
     [Header("Spawn Mode")]
     [Tooltip("플레이어를 생성할 방식을 선택합니다.")]
     [FormerlySerializedAs("spawnBackend")]
-    [SerializeField] private PlayerSpawnMode spawnMode = PlayerSpawnMode.LocalInstantiate;
+    [SerializeField] private PlayerSpawnMode spawnMode = PlayerSpawnMode.FusionNetwork;
     [Tooltip("인게임 매니저가 시작될 때 자동으로 플레이어를 생성합니다.")]
     [SerializeField] private bool spawnOnStart = true;
 
     [Header("Local Spawn")]
-    [Tooltip("로컬 테스트에서 생성할 플레이어 프리팹입니다.")]
+    [Tooltip("레거시 로컬 테스트용으로 생성할 플레이어 프리팹입니다.")]
     [SerializeField] private GameObject localPlayerPrefab;
-    [Tooltip("로컬 테스트에서 생성할 플레이어 수입니다.")]
+    [Tooltip("레거시 로컬 테스트용으로 생성할 플레이어 수입니다.")]
     [Range(1, 4)]
     [SerializeField] private int localPlayerCount = 1;
 
@@ -47,7 +47,7 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
     [Tooltip("기준 위치를 중심으로 플레이어를 사각형으로 벌려 배치할 거리입니다.")]
     [Min(0f)]
     [SerializeField] private float singleSpawnPointOffsetDistance = 1.5f;
-    [Tooltip("생성된 로컬 플레이어를 정리해서 담을 부모 Transform입니다.")]
+    [Tooltip("레거시 로컬 테스트용으로 생성된 플레이어를 정리해서 담을 부모 Transform입니다.")]
     [SerializeField] private Transform spawnedPlayersParent;
 
     private readonly List<GameObject> spawnedLocalPlayers = new List<GameObject>();
@@ -55,6 +55,7 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
 
     private InGameBootstrap runnerBootstrap;
     private NetworkRunner registeredRunner;
+    private bool didWarnLegacyLocalSpawn;
 
     public IReadOnlyList<GameObject> SpawnedLocalPlayers
     {
@@ -65,6 +66,7 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
     {
         if (spawnMode != PlayerSpawnMode.FusionNetwork)
         {
+            WarnLegacyLocalSpawnModeOnce();
             return;
         }
 
@@ -96,6 +98,7 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
 
         if (spawnMode == PlayerSpawnMode.LocalInstantiate && spawnOnStart)
         {
+            WarnLegacyLocalSpawnModeOnce();
             SpawnLocalPlayers();
         }
         else if (spawnMode == PlayerSpawnMode.FusionNetwork && spawnOnStart)
@@ -172,6 +175,8 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
 
     public void SpawnLocalPlayers()
     {
+        WarnLegacyLocalSpawnModeOnce();
+
         for (int i = 0; i < localPlayerCount; i++)
         {
             SpawnLocalPlayer(i);
@@ -288,6 +293,17 @@ public sealed class InGamePlayerSpawnManager : MonoBehaviour, INetworkRunnerCall
         {
             spawnedLocalPlayers.Add(null);
         }
+    }
+
+    private void WarnLegacyLocalSpawnModeOnce()
+    {
+        if (didWarnLegacyLocalSpawn)
+        {
+            return;
+        }
+
+        didWarnLegacyLocalSpawn = true;
+        Debug.LogWarning($"{nameof(InGamePlayerSpawnManager)}: LocalInstantiate는 레거시 로컬 테스트용 경로입니다. 공식 플레이 흐름은 FusionNetwork를 사용합니다.", this);
     }
 
     private int GetNetworkPlayerIndex(PlayerRef player)
